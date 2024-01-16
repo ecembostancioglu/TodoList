@@ -40,43 +40,43 @@ class DetailsVC: UIViewController, UINavigationControllerDelegate, PHPickerViewC
     @IBOutlet weak var deadlineDP: UIDatePicker!
     @IBOutlet weak var imageView: UIImageView!
     
-    var chosenImage = ""
+    var chosenTodo = ""
     var chosenId : UUID?
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        if chosenImage != ""{
+        if chosenTodo != ""{
             //Core Data
             
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
-                     let context = appDelegate.persistentContainer.viewContext
+            let context = appDelegate.persistentContainer.viewContext
                      
-                     let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Paintings")
-                     let idString = chosenId?.uuidString
-                     fetchRequest.predicate = NSPredicate(format: "id = %@", idString!)
-                     fetchRequest.returnsObjectsAsFaults = false
+            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "ToDoList")
+            let idString = chosenId?.uuidString
+            fetchRequest.predicate = NSPredicate(format: "id = %@", idString!)
+            fetchRequest.returnsObjectsAsFaults = false
             
             
-                     do{
-                       let results = try context.fetch(fetchRequest)
+            do{
+                let results = try context.fetch(fetchRequest)
                           
-                         if results.count > 0 {
-                             for result in results as! [NSManagedObject]{
-                                 if let todo = result.value(forKey: "todo") as? String {
+                    if results.count > 0 {
+                        for result in results as! [NSManagedObject]{
+                            if let todo = result.value(forKey: "todo") as? String {
                                      todoField.text = todo
-                                 }
-                                 if let descript = result.value(forKey: "descrip") as? String {
-                                     descriptionField.text = descript
-                                 }
-                                 if let date = result.value(forKey: "deadline") as? Date{
+                        }
+                            if let descript = result.value(forKey: "descript") as? String {
+                                    descriptionField.text = descript
+                        }
+                            if let date = result.value(forKey: "date") as? Date{
                                      deadlineDP.date = date
-                                 }
-                                 if let imageData = result.value(forKey: "image") as? Data{
-                                     let image = UIImage(data: imageData)
+                        }
+                            if let imageData = result.value(forKey: "image") as? Data{
+                                    let image = UIImage(data: imageData)
                                      imageView.image = image
-                                 }
+                        }
                              }
                          }
                          
@@ -131,6 +131,9 @@ class DetailsVC: UIViewController, UINavigationControllerDelegate, PHPickerViewC
         newTodo.setValue(descriptionField.text!, forKey: "descript")
         newTodo.setValue(deadlineDP.date, forKey: "date")
         newTodo.setValue(UUID(), forKey: "id")
+        
+        let data = imageView.image?.jpegData(compressionQuality: 0.5)
+        newTodo.setValue(data, forKey: "image")
         
         do{
             try context.save()

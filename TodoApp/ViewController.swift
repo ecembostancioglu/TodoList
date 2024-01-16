@@ -7,6 +7,8 @@
 
 import UIKit
 import CoreData
+import Foundation
+
 
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
@@ -16,6 +18,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     var dateArray = [Date]()
     var idArray = [UUID]()
     
+    var selectedTodo = ""
+    var selectedId : UUID?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -71,21 +75,87 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
 
     @IBAction func buttonClicked(_ sender: Any) {
-        
+        selectedTodo = ""
         performSegue(withIdentifier: "toDetailsVC", sender: nil)
         
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+           if segue.identifier == "toDetailsVC"{
+               let destinationVC = segue.destination as! DetailsVC
+               destinationVC.chosenTodo = selectedTodo
+               destinationVC.chosenId = selectedId
+           }
+       }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return todoArray.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell()
+        let cell = tableView.dequeueReusableCell(withIdentifier: "todos")!
         cell.textLabel?.text = todoArray[indexPath.row]
+        
+        let dateFormatter = DateFormatter()
+           dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        
+        cell.detailTextLabel?.text = dateFormatter.string(from: dateArray[indexPath.row])
         return cell
         
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        selectedTodo = todoArray[indexPath.row]
+        selectedId = idArray[indexPath.row]
+        performSegue(withIdentifier: "toDetailsVC", sender: nil)
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath){
+        if editingStyle == .delete{
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            let context = appDelegate.persistentContainer.viewContext
+            
+            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "ToDoList")
+            
+            let idString = idArray[indexPath.row].uuidString
+            
+            fetchRequest.predicate = NSPredicate(format: "id = %@", idString)
+            
+            fetchRequest.returnsObjectsAsFaults = false
+            
+            do{
+                let results = try context.fetch(fetchRequest)
+                
+                if results.count > 0 {
+                    
+                    for result in results as! [NSManagedObject]{
+                        
+                        if let id = result.value(forKey: "id") as? UUID{
+                            
+                            if id == idArray[indexPath.row]{
+                                context.delete(result)
+                                todoArray.remove(at: indexPath.row)
+                                idArray.remove(at: indexPath.row)
+                                self.tableView.reloadData()
+                                
+                                do{
+                                    try context.save()
+                                } catch {
+                                    print("error")
+                                }
+                                break
+                            }
+                        }
+                    }
+                }
+               
+            }  catch let fetchError as NSError {
+                print("Error fetching data: \(fetchError.localizedDescription)")
+                
+            }
+
+        }
+    }
+    
     
 }
 
