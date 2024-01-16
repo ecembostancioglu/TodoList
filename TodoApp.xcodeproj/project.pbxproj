@@ -14,6 +14,7 @@
 		42111B602B56828300A9D831 /* TodoApp.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 42111B5E2B56828300A9D831 /* TodoApp.xcdatamodeld */; };
 		42111B622B56828300A9D831 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 42111B612B56828300A9D831 /* Assets.xcassets */; };
 		42111B652B56828300A9D831 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 42111B632B56828300A9D831 /* LaunchScreen.storyboard */; };
+		428ED1562B56B14000637C92 /* DetailsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 428ED1552B56B14000637C92 /* DetailsVC.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		42111B612B56828300A9D831 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		42111B642B56828300A9D831 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		42111B662B56828300A9D831 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		428ED1552B56B14000637C92 /* DetailsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsVC.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +63,7 @@
 				42111B552B56828300A9D831 /* AppDelegate.swift */,
 				42111B572B56828300A9D831 /* SceneDelegate.swift */,
 				42111B592B56828300A9D831 /* ViewController.swift */,
+				428ED1552B56B14000637C92 /* DetailsVC.swift */,
 				42111B5B2B56828300A9D831 /* Main.storyboard */,
 				42111B612B56828300A9D831 /* Assets.xcassets */,
 				42111B632B56828300A9D831 /* LaunchScreen.storyboard */,
@@ -145,6 +148,7 @@
 				42111B562B56828300A9D831 /* AppDelegate.swift in Sources */,
 				42111B582B56828300A9D831 /* SceneDelegate.swift in Sources */,
 				42111B602B56828300A9D831 /* TodoApp.xcdatamodeld in Sources */,
+				428ED1562B56B14000637C92 /* DetailsVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
