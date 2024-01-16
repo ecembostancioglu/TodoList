@@ -7,23 +7,120 @@
 
 import UIKit
 import CoreData
+import PhotosUI
 
-class DetailsVC: UIViewController {
+class DetailsVC: UIViewController, UINavigationControllerDelegate, PHPickerViewControllerDelegate{
 
+    
+    
+     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+         picker.dismiss(animated: true)
+                if let itemprovider = results.first?.itemProvider{
+                  
+                    if itemprovider.canLoadObject(ofClass: UIImage.self){
+                       
+                        itemprovider.loadObject(ofClass: UIImage.self) { image , error  in
+                            if let selectedImage = image as? UIImage{
+                                DispatchQueue.main.async {
+                                    self.imageView.image = selectedImage
+                                }
+                            }
+                        }
+                    }
+                    
+                }
+     }
+     
+
+ 
+    
     
     @IBOutlet weak var todoField: UITextField!
     @IBOutlet weak var descriptionField: UITextField!
     @IBOutlet weak var deadlineDP: UIDatePicker!
     @IBOutlet weak var imageView: UIImageView!
     
+    var chosenImage = ""
+    var chosenId : UUID?
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        if chosenImage != ""{
+            //Core Data
+            
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                     let context = appDelegate.persistentContainer.viewContext
+                     
+                     let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Paintings")
+                     let idString = chosenId?.uuidString
+                     fetchRequest.predicate = NSPredicate(format: "id = %@", idString!)
+                     fetchRequest.returnsObjectsAsFaults = false
+            
+            
+                     do{
+                       let results = try context.fetch(fetchRequest)
+                          
+                         if results.count > 0 {
+                             for result in results as! [NSManagedObject]{
+                                 if let todo = result.value(forKey: "todo") as? String {
+                                     todoField.text = todo
+                                 }
+                                 if let descript = result.value(forKey: "descrip") as? String {
+                                     descriptionField.text = descript
+                                 }
+                                 if let date = result.value(forKey: "deadline") as? Date{
+                                     deadlineDP.date = date
+                                 }
+                                 if let imageData = result.value(forKey: "image") as? Data{
+                                     let image = UIImage(data: imageData)
+                                     imageView.image = image
+                                 }
+                             }
+                         }
+                         
+                     }catch{
+                         print("error")
+                     }
+            
+        } else {
+            todoField.text = ""
+            descriptionField.text = ""
+        }
+        
+        //Recognizers
+        
+        let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
+        view.addGestureRecognizer(gestureRecognizer)
+        
+        imageView.isUserInteractionEnabled = true
+                let imageTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(selectImage))
+                imageView.addGestureRecognizer(imageTapRecognizer)
       
     }
     
     
+    @objc func hideKeyboard(){
+           view.endEditing(true)
+       }
+    
+    @objc func selectImage(){
+           
+           configureImagePicker()
+           
+       }
+       
+       func configureImagePicker(){
+           var configuration = PHPickerConfiguration()
+                     configuration.selectionLimit = 1
+                     configuration.filter = .images
+           let pickerViewController = PHPickerViewController(configuration: configuration)
+                     pickerViewController.delegate = self
+                     present(pickerViewController, animated: true)
+          }
+       
+       
     @IBAction func saveButtonClicked(_ sender: Any) {
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
